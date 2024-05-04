@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "axios": "^1.6.8",
+    "axios-retry": "^4.1.0",
     "input": "^1.0.1",
     "loglevel": "^1.9.1",
     "loglevel-plugin-prefix": "^0.8.4",

@@ -3,7 +3,7 @@ const telegram = require("./telegram");
 const { SocksProxyAgent } = require('socks-proxy-agent');
 const axios = require('axios');
 const log = require("../utils/logger");
-
+const axiosRetry = require('axios-retry').default;
 
 class Account {
     constructor(username, session, api_id, api_hash, proxy) {
@@ -22,6 +22,7 @@ class Account {
             httpAgent: proxyAgent,
             headers: {'User-Agent': utils.get_UA()}
         });
+        axiosRetry(this.axios, { retries: 5, retryDelay: axiosRetry.exponentialDelay });
     };
 };
 

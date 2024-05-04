@@ -1,11 +1,13 @@
-const log = require("./utils/utils");
+const log = require("./utils/logger");
 const telegram = require("./telegram/telegram");
 
 
 async function login(Account){
     try {
         let json_data = {"query": await telegram.get_TgWebData(Account.client)}
-        let resp = await Account.axios.post("https://gateway.blum.codes/v1/auth/provider/PROVIDER_TELEGRAM_MINI_APP", json_data)
+        let resp = await Account.axios.post("https://gateway.blum.codes/v1/auth/provider/PROVIDER_TELEGRAM_MINI_APP", json_data).catch(function (error) {
+            log.error(error.toJSON());
+        });
         const accessToken = resp.data.token.access;
         Account.axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
     }
@@ -16,7 +18,9 @@ async function login(Account){
 
 async function balance(Account){
     try {
-        let resp = await Account.axios.get("https://game-domain.blum.codes/api/v1/user/balance")
+        let resp = await Account.axios.get("https://game-domain.blum.codes/api/v1/user/balance").catch(function (error) {
+            log.error(error.toJSON());
+        });
         let timestamp = resp.data.timestamp;
         let start_time = null;
         let end_time = null;
@@ -34,7 +38,9 @@ async function balance(Account){
 
 async function claim(Account){
     try {
-        let resp = await Account.axios.post("https://game-domain.blum.codes/api/v1/farming/claim")
+        let resp = await Account.axios.post("https://game-domain.blum.codes/api/v1/farming/claim").catch(function (error) {
+            log.error(error.toJSON());
+        });
         let timestamp = resp.data.timestamp;
         let balance = resp.data.availableBalance;
         return timestamp, balance;
@@ -46,7 +52,9 @@ async function claim(Account){
 
 async function start(Account){
     try {
-        let resp = await Account.axios.post("https://game-domain.blum.codes/api/v1/farming/start");
+        let resp = await Account.axios.post("https://game-domain.blum.codes/api/v1/farming/start").catch(function (error) {
+            log.error(error.toJSON());
+        });
         let start_time = resp.data.startTime;
         let end_time = resp.data.endTime;
         return [ start_time, end_time ];
