@@ -12,7 +12,8 @@
 ## About
 
 Automatically collect rewards and start farming !
-Proxy supported
+
+Proxy **ONLY SOCKS5**  supported
 
 ## Setup
 
