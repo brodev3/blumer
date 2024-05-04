@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "axios": "^1.6.8",
+    "input": "^1.0.1",
+    "loglevel": "^1.9.1",
+    "loglevel-plugin-prefix": "^0.8.4",
+    "socks-proxy-agent": "^8.0.3",
+    "telegram": "^2.20.15"
+  }
+}
