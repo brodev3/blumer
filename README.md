@@ -19,8 +19,9 @@ Proxy **ONLY SOCKS5**  supported
 
 1. Node JS
 2. Clone the repository to your disk
-3. Launch the console (for example, Windows PowerShell)
-4. Specify the working directory where you have uploaded the repository in the console using the CD command
+3. In the **scr** folder, change the name of the ```config_ex.json``` on ```config.json```
+4. Launch the console (for example, Windows PowerShell)
+5. Specify the working directory where you have uploaded the repository in the console using the CD command
     ```
     cd C:\Program Files\blumer
     ```
