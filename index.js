@@ -4,7 +4,6 @@ const blum = require("./scr/blum");
 (async () => {
     let accounts = await manager.start_Accounts();
     for (let account in accounts){
-        await blum.login(accounts[account])
         await blum.farming(accounts[account]);
     }
 

@@ -18,8 +18,12 @@ async function login(Account){
 
 async function balance(Account){
     try {
-        let resp = await Account.axios.get("https://game-domain.blum.codes/api/v1/user/balance").catch(function (error) {
+        let resp = await Account.axios.get("https://game-domain.blum.codes/api/v1/user/balance").catch(async function (error) {
             log.error(error.toJSON());
+            if (error.response.status == 401){
+                await login(Account);
+                resp = await Account.axios.get("https://game-domain.blum.codes/api/v1/user/balance");
+            };
         });
         let timestamp = resp.data.timestamp;
         let start_time = null;
@@ -66,11 +70,13 @@ async function start(Account){
 
 async function farming(Account){
     try {
-       let [ timestamp, start_time, end_time ]  = await balance(Account);
+        await Account.connect();
+        await login(Account);
+        let [ timestamp, start_time, end_time ]  = await balance(Account);
         if (start_time == null && end_time == null){
             [ start_time, end_time ]  = await start(Account);
             setTimeout(farming, (end_time - timestamp + 5), Account);
-            log.info(`Account ${Account.username} | Start farming!`);            
+            log.info(`Account ${Account.username} | Start farming!`);
         } 
         else if(start_time != null && end_time != null){
             if ( timestamp >= end_time) {
@@ -80,8 +86,12 @@ async function farming(Account){
             }
             else {
                 setTimeout(farming, (end_time - timestamp + 5), Account);
+                log.info(`Account ${Account.username} | Waiting claim...`);
             };
         };
+        await Account.client.disconnect();
+        await Account.client.destroy();
+        return;
     }
     catch (err){
         log.error(`Account ${Account.username} | Error: ${err}`);
