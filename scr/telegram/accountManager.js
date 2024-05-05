@@ -17,12 +17,12 @@ class Account {
     async connect(){
         this.client = await telegram.get_Client(this.session, this.api_id, this.api_hash, this.proxy);
         const proxyAgent  = new SocksProxyAgent(`socks5://${this.proxy.username}:${this.proxy.password}@${this.proxy.ip}:${this.proxy.port}`);
-        this.axios = axios.create({
+        this.axios = await axios.create({
             httpsAgent: proxyAgent, 
             httpAgent: proxyAgent,
             headers: {'User-Agent': utils.get_UA()}
         });
-        axiosRetry(this.axios, { retries: 5, retryDelay: axiosRetry.exponentialDelay });
+        axiosRetry(this.axios, { retries: 5 });
     };
 };
 
