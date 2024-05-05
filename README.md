@@ -33,7 +33,9 @@ Proxy **ONLY SOCKS5**  supported
     ```
     node scr/telegram/import
     ```
-You need to create an application and get the api_id and api_hash for yours accounts
+You need to create an application and get the api_id and api_hash for yours accounts.
+
+Proxy format: ```ip:port:login:pass```
 
 Visit: https://my.telegram.org/
 
