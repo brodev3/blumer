@@ -36,7 +36,7 @@ Proxy **ONLY SOCKS5**  supported
     ```
 You need to create an application and get the api_id and api_hash for yours accounts.
 
-Proxy format: ```ip:port:login:pass```
+Proxy format: ```ip:port:login:pass``` OR send empty string for direct connection
 
 Visit: https://my.telegram.org/
 
