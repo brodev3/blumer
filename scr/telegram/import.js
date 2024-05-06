@@ -8,24 +8,33 @@ const manager = require("./accountManager");
     let apiId = await input.text("apiId ?");
     let apiHash = await input.text("apiHash?");
     let proxy = await input.text("proxy?");
-    proxy = proxy.split(":");
-    let ip = proxy[0];
-    let port = Number(proxy[1]);
-    let username = proxy[2];
-    let password = proxy[3];
     let stringSession = new StringSession("");
-    const client = new TelegramClient(stringSession, Number(apiId), apiHash, {
-        connectionRetries: 5,
-        useWSS: false,
-        proxy: {
-            ip: ip, 
-            port: port, 
-            username: username, 
-            password: password, 
-            socksType: 5, 
-            timeout: 2, 
-          },
-    });
+    let options = { };
+    if (proxy != ""){
+        proxy = proxy.split(":");
+        let ip = proxy[0];
+        let port = Number(proxy[1]);
+        let username = proxy[2];
+        let password = proxy[3];
+        options = {
+            connectionRetries: 5,
+            useWSS: false,
+            proxy: {
+                ip: ip, 
+                port: port, 
+                username: username, 
+                password: password, 
+                socksType: 5, 
+                timeout: 2, 
+            },
+        };
+    }
+    else 
+        options = {
+            connectionRetries: 5,
+        };
+
+    const client = new TelegramClient(stringSession, Number(apiId), apiHash, options);
     await client.start({
         phoneNumber: async () => await input.text("number ?"),
         password: async () => await input.text("password?"),
@@ -38,15 +47,19 @@ const manager = require("./accountManager");
         api_id: Number(apiId),
         api_hash: apiHash,
         session: client.session.save(),
-        proxy: {
+        username: me.username
+    };
+    if (proxy != "")
+        accData["proxy"] = {
             ip: ip, 
             port: port, 
             username: username, 
             password: password, 
             socksType: 5, 
             timeout: 2, 
-          },
-        username: me.username
-    };
+        };
+    else 
+        accData["proxy"] = false;
+
     manager.add_NewAccount(accData);
 })();

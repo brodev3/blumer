@@ -6,12 +6,20 @@ const log = require("../utils/logger");
 
 let get_Client = async (stringSession, apiId, apiHash, proxy) => {
     stringSession = new StringSession(stringSession);
-    const client = new TelegramClient(stringSession, Number(apiId), apiHash, {
-        connectionRetries: 5,
-        useWSS: false,
-        proxy: proxy,
-        autoReconnect: true
-    });
+    let options = {};
+    if (proxy != false)
+        options = {
+            connectionRetries: 5,
+            useWSS: false,
+            proxy: proxy,
+            autoReconnect: true
+        };
+    else
+        options = {
+            connectionRetries: 5,
+            autoReconnect: true
+        };
+    const client = new TelegramClient(stringSession, Number(apiId), apiHash, options);
     let validSession = await client.connect();
     if (validSession)
         return client;
