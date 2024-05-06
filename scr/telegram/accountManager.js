@@ -22,7 +22,12 @@ class Account {
             httpAgent: proxyAgent,
             headers: {'User-Agent': utils.get_UA()}
         });
-        axiosRetry(this.axios, { retries: 5 });
+        axiosRetry(this.axios, { 
+            retries: 10,
+            retryDelay: (retryCount) => {
+                log.info(`Retry attempt: ${retryCount}`);
+                return retryCount * 2000; // time interval between retries
+            }, });
     };
 };
 
