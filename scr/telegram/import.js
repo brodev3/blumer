@@ -51,10 +51,10 @@ const manager = require("./accountManager");
     };
     if (proxy != "")
         accData["proxy"] = {
-            ip: ip, 
-            port: port, 
-            username: username, 
-            password: password, 
+            ip: options.proxy.ip, 
+            port: options.proxy.port, 
+            username: options.proxy.username, 
+            password: options.proxy.password, 
             socksType: 5, 
             timeout: 2, 
         };
