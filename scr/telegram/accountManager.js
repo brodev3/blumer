@@ -63,6 +63,7 @@ let start_Accounts = async function (){
         await result[account].connect();
         log.info(`${account} connected`);
     };
+    log.info(`Started ${listAccounts.length} accounts`);
     return result;
 };
 
