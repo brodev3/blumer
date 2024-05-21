@@ -86,7 +86,7 @@ async function farming(Account){
             log.info(`Account ${Account.username} | Start farming!`);
         } 
         else if(start_time != null && end_time != null){
-            if ( timestamp >= end_time) {
+            if ( Date.now() >= end_time) {
                 let [ timestamp, balance ] = await claim(Account);
                 log.info(`Account ${Account.username} | Claimed reward! Balance: ${balance}`);
                 setTimeout(farming, 10 * 1000, Account);
