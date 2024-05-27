@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "@notionhq/client": "^2.2.15",
     "axios": "^1.6.8",
     "axios-retry": "^4.1.0",
+    "dotenv": "^16.4.5",
     "input": "^1.0.1",
     "loglevel": "^1.9.1",
     "loglevel-plugin-prefix": "^0.8.4",
