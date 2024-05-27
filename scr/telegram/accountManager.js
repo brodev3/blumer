@@ -30,12 +30,6 @@ class Account {
                 headers: {'User-Agent': utils.get_UA()},
             }
         this.axios = await axios.create(options);
-        // axiosRetry(this.axios, { 
-        //     retries: 10,
-        //     retryDelay: (retryCount) => {
-        //         log.info(`Retry attempt: ${retryCount}`);
-        //         return retryCount * 100; // time interval between retries
-        //     }, });
     };
 };
 
