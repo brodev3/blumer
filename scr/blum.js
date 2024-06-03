@@ -137,7 +137,6 @@ async function daily(Account){
         for (let i = 0; i < play_passes; i++){
             setTimeout(play, Math.round(Math.random() * (3_600_000 - 5_000) + 5_000), Account)
         }
-        return setTimeout(daily, Math.round(Math.random() * (90_000_000 - 87_000_000) + 87_000_000), Account)
     }
     catch (err){
         log.error(`Account: ${Account.username} ` + err);
@@ -149,7 +148,7 @@ async function tasks(Account){
         let resp = await axiosRetry.get(Account.axios, "https://game-domain.blum.codes/api/v1/tasks");
         for (let i = 0; i < resp.data.length; i++){
             let task = resp.data[i];
-            if (task.status == "CLAIMED")
+            if (task.status == "CLAIMED" || task.title.includes("Invite"))
                 continue;
             if (task.status == "NOT_STARTED"){
                 let res = await axiosRetry.post(Account.axios, `https://game-domain.blum.codes/api/v1/tasks/${task["id"]}/start`);
