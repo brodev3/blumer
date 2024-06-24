@@ -26,9 +26,15 @@ async function get(instance, url, retriesLeft = 10) {
 async function post(instance, url, body, retriesLeft = 10) {
     let response = await instance.post(url, body).catch(async error => {
         if (error.response){
-            if (error.response.data.message == 'same day' || error.response.data.message == "It's too early to claim")
+            if (error.response.data.message == 'same day' || 
+                error.response.data.message == "It's too early to claim" || 
+                error.response.data.message == 'Task is already claimed' ||
+                error.response.data.message == "Task is already started" 
+            )
                 return true
-            if (error.response.data.message == 'Need to start farm' || error.response.data.message == 'cannot start game')
+            if (error.response.data.message == 'Need to start farm' || 
+                error.response.data.message == 'cannot start game' ||
+                error.response.data.message == "Task is not done" )
                 return false;
         }
 
