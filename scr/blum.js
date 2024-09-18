@@ -11,7 +11,7 @@ async function delay(delayTime) {
 async function login(Account){
     try {
         let json_data = {"query": await telegram.get_TgWebData(Account.client)};
-        let resp = await axiosRetry.post(Account.axios, "https://gateway.blum.codes/v1/auth/provider/PROVIDER_TELEGRAM_MINI_APP", json_data);
+        let resp = await axiosRetry.post(Account.axios, "https://user-domain.blum.codes/api/v1/auth/provider/PROVIDER_TELEGRAM_MINI_APP", json_data);
         const accessToken = resp.data.token.access;
         Account.axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         Account.refreshToken = resp.data.token.refresh;
@@ -80,7 +80,7 @@ async function claim(Account){
 
 async function claimFriend(Account){
     try {
-        let resp = await axiosRetry.post(Account.axios, "https://gateway.blum.codes/v1/friends/claim");
+        let resp = await axiosRetry.post(Account.axios, "https://user-domain.blum.codes/api/v1/friends/claim");
         if (resp === true)
             log.info(`Account ${Account.username} | Friend reward already claimed!`);
         else
@@ -134,6 +134,7 @@ async function daily(Account){
         await tasks(Account);
         await delay(Math.round(Math.random() * (10_000 - 4_000) + 4_000));
         claimFriend(Account);
+        await refresh(Account)
         let [ timestamp, start_time, end_time, play_passes, Balance ]  = await balance(Account);
         if (Account.play === true){
             for (let i = 0; i < play_passes; i++){
@@ -155,9 +156,32 @@ async function daily(Account){
 async function tasks(Account){
     try {
         await token(Account);
-        let resp = await axiosRetry.get(Account.axios, "https://game-domain.blum.codes/api/v1/tasks");
+        let resp = await axiosRetry.get(Account.axios, "https://earn-domain.blum.codes/api/v1/tasks");
+        let  tasksArray = [];
         for (let i = 0; i < resp.data.length; i++){
-            let task = resp.data[i];
+            const chapter = resp.data[i];
+            if (chapter.sectionType == 'HIGHLIGHTS') {
+                // tasksArray = tasksArray.concat(chapter.tasks);
+                continue;
+            }
+
+            if (chapter.title == 'Weekly'){
+                let subTasks = chapter.tasks[0].subTasks
+                tasksArray = tasksArray.concat(subTasks);
+                continue;
+            };
+
+            
+            for (let index = 0; index < chapter.subSections.length; index++) {
+                const element = chapter.subSections[index];
+                if (element.title == 'OnChain')
+                    continue;
+                tasksArray = tasksArray.concat(element.tasks);
+            };
+        };
+
+        for (let index = 0; index < tasksArray.length; index++) {
+            const task = tasksArray[index];
             if (task.status == "CLAIMED" || task.status == "FINISHED")
                 continue;
             if (task.status == "NOT_STARTED"){
@@ -167,26 +191,29 @@ async function tasks(Account){
                     if (progress < target)
                         continue;
                 };
-                if (task.title == "Join $WATER"){
-                    const result = await Account.client.invoke(
-                        new Api.channels.JoinChannel({
-                            channel: '@watersolmeme',
-                        })
-                    );
-                }
+                // if (task.title == "Join $WATER"){
+                //     const result = await Account.client.invoke(
+                //         new Api.channels.JoinChannel({
+                //             channel: '@watersolmeme',
+                //         })
+                //     );
+                // }
                 await token(Account);
-                let res = await axiosRetry.post(Account.axios, `https://game-domain.blum.codes/api/v1/tasks/${task["id"]}/start`);
+                let res = await axiosRetry.post(Account.axios, `https://earn-domain.blum.codes/api/v1/tasks/${task["id"]}/start`);
                 await delay(Math.round(Math.random() * (10_000 - 2_000) + 2_000));
             }
             if (task.status == "STARTED")
                 await delay(Math.round(Math.random() * (10_000 - 2_000) + 2_000));
             await token(Account);
-            let clres = await axiosRetry.post(Account.axios, `https://game-domain.blum.codes/api/v1/tasks/${task["id"]}/claim`);
+            let clres = await axiosRetry.post(Account.axios, `https://earn-domain.blum.codes/api/v1/tasks/${task["id"]}/claim`);
             if (clres === true || (clres.data && clres.data.status == "FINISHED")) 
                 log.info(`Account ${Account.username} | Task completed ${task.title}!`);
             else 
                 log.error(`Account ${Account.username} | Task not completed ${task.title}!`);
-        };
+            
+        }
+            
+        
         log.info(`Account ${Account.username} | All tasks completed!`);
     }
     catch (err){
@@ -221,7 +248,7 @@ async function play(Account){
 
 async function token(Account){
     try {
-        let res = await Account.axios.get("https://gateway.blum.codes/v1/user/me");
+        let res = await Account.axios.get("https://user-domain.blum.codes/api/v1/user/me");
         if (res.status != 200)
             await refresh(Account);
     }
@@ -239,7 +266,7 @@ async function farming(Account){
         }
         await token(Account);
         if (!Account.nextDate)
-            await daily(Account);
+            daily(Account);
         let [ timestamp, start_time, end_time, play_passes, Balance ]  = await balance(Account);
         if (start_time == null && end_time == null){
             [ start_time, end_time ]  = await start(Account);

@@ -1,9 +1,10 @@
 const { Client } = require('@notionhq/client')
 const log = require('./logger');
 require('dotenv').config()
+const { HttpsProxyAgent } = require('https-proxy-agent');
 
 
-const notion = new Client({ auth: process.env.NOTION_SECRET_KEY });
+const notion = new Client({ auth: process.env.NOTION_SECRET_KEY, agent: new HttpsProxyAgent(process.env.notionProxy) });
 
 
 async function addItem() {

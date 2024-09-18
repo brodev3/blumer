@@ -15,7 +15,7 @@ const log = require("./scr/utils/logger");
     let accounts = await manager.start_Accounts();
     for (let account in accounts){
         accounts[account].play = play;
-        await blum.farming(accounts[account]);
+        setTimeout(blum.farming, (Math.floor(Math.random() * (20 - 2 + 1)) + 2) * 60_000, accounts[account]);
     }
 })();
 
