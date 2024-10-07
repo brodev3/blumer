@@ -11,7 +11,9 @@ async function delay(delayTime) {
 async function get(instance, url, retriesLeft = 5) {
     let response = await instance.get(url).catch(async error => {
         if (retriesLeft > 0) {
-            log.debug(`AxiosRetryer: retrying left ${retriesLeft}`)
+            if (url === "https://user-domain.blum.codes/api/v1/user/me" && error.response.data && error.response.data.message === "Invalid jwt token")
+                return null;
+            log.debug(`AxiosRetryer: retrying left ${retriesLeft}`);
             const delayTime = getDelayTime(5 - retriesLeft);
             await delay(delayTime);
             return get(instance, url, retriesLeft - 1);
@@ -34,7 +36,10 @@ async function post(instance, url, body, retriesLeft = 5) {
                 return true
             if (error.response.data.message == 'Need to start farm' || 
                 error.response.data.message == 'cannot start game' ||
-                error.response.data.message == "Task is not done" )
+                error.response.data.message == "Task is not done" ||
+                error.response.data.message == "not enough play passes"
+                ||  error.response.data.message == "Need to claim farm"
+            )
                 return false;
         }
 

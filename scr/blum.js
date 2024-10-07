@@ -23,11 +23,20 @@ async function login(Account){
 
 async function refresh(Account){
     try {
-        let json_data = {"refresh": Account.refreshToken};
-        let resp = await axiosRetry.post(Account.axios, "https://gateway.blum.codes/v1/auth/refresh", json_data);
-        const accessToken = resp.data.access;
-        Account.axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        Account.refreshToken = resp.data.refresh;
+        let resp = await axiosRetry.get(Account.axios, "https://user-domain.blum.codes/api/v1/user/me");
+        
+        if (resp !== null)
+            return;
+
+        // if (Account.axios.defaults.headers.common['Authorization']) {
+        //     delete Account.axios.defaults.headers.common['Authorization'];
+        // };
+        // let json_data = {"refresh": Account.refreshToken};
+        // resp = await axiosRetry.post(Account.axios, "https://user-domain.blum.codes/v1/auth/refresh", json_data);
+        // const accessToken = resp.data.access;
+        // Account.axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        // Account.refreshToken = resp.data.refresh;
+        await login(Account);
     }
     catch (err){
         log.error(`Account: ${Account.username} ` + err);
@@ -36,6 +45,7 @@ async function refresh(Account){
 
 async function balance(Account){
     try {
+        await refresh(Account);
         let resp = await axiosRetry.get(Account.axios, "https://game-domain.blum.codes/api/v1/user/balance")
         let timestamp = resp.data.timestamp;
         let start_time = null;
@@ -80,6 +90,7 @@ async function claim(Account){
 
 async function claimFriend(Account){
     try {
+        await refresh(Account);
         let resp = await axiosRetry.post(Account.axios, "https://user-domain.blum.codes/api/v1/friends/claim");
         if (resp === true)
             log.info(`Account ${Account.username} | Friend reward already claimed!`);
@@ -93,6 +104,7 @@ async function claimFriend(Account){
 
 async function claimGame(Account, game_id){
     try {
+        await refresh(Account);
         let points = Math.round(Math.random() * (275 - 220) + 220);
         let resp = await axiosRetry.post(Account.axios, "https://game-domain.blum.codes/api/v1/game/claim", {
             gameId: game_id,
@@ -111,7 +123,11 @@ async function claimGame(Account, game_id){
 
 async function start(Account){
     try {
-        let resp = await axiosRetry.post(Account.axios, "https://game-domain.blum.codes/api/v1/farming/start")
+        let resp = await axiosRetry.post(Account.axios, "https://game-domain.blum.codes/api/v1/farming/start");
+        if (resp === false){
+            await claim(Account);
+            resp = await axiosRetry.post(Account.axios, "https://game-domain.blum.codes/api/v1/farming/start");
+        }
         let start_time = resp.data.startTime;
         let end_time = resp.data.endTime;
         return [ start_time, end_time ];
@@ -248,7 +264,7 @@ async function play(Account){
 
 async function token(Account){
     try {
-        let res = await Account.axios.get("https://user-domain.blum.codes/api/v1/user/me");
+        let res = await axiosRetry.get(Account.axios, "https://user-domain.blum.codes/api/v1/user/me");
         if (res.status != 200)
             await refresh(Account);
     }
